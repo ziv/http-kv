@@ -1,6 +1,6 @@
 {
   "id": "@xpr/http-kv",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "description": "RPC server & client for Deno.Kv",
   "exports": {
@@ -11,9 +11,9 @@
   "publish": {
     "exclude": [
       ".github",
-      "tmp",
-      "node_modules",
-      "package*.json"
+      "server",
+      "script",
+      "tmp"
     ]
   }
 }
