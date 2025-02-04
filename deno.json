@@ -1,5 +1,5 @@
 {
-  "id": "@xpr/http-kv",
+  "name": "@xpr/http-kv",
   "version": "0.0.1",
   "license": "MIT",
   "description": "RPC server & client for Deno.Kv",
