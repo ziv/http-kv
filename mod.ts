@@ -1,3 +1,3 @@
 import dispatcher from "./dispatcher.ts";
-import HttpKv from "./tmp/kv/http-kv.ts";
+import HttpKv from "./client.ts";
 export { dispatcher, HttpKv };
