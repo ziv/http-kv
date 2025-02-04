@@ -1,4 +1,5 @@
 {
+  "id": "xpr-rpc-kv",
   "tasks": {
     "dev": "deno run --watch main.ts"
   },

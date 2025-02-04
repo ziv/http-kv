@@ -10,7 +10,7 @@ import { debuglog, errorlog } from "../utils/log.ts";
 import kv from "../kv/server-kv.ts";
 import { errorString } from "../utils/error.ts";
 
-Deno.serve({ port: 3000 }, async (req) => {
+Deno.serve(async (req) => {
   try {
     const p = await authenticate(req);
     debuglog("authenticated request", p);
