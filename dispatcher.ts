@@ -1,5 +1,9 @@
 type KvMethods = keyof Deno.Kv;
-export type KvCommand<C extends KvMethods = KvMethods, A = unknown[]> = { cmd: C; args: A };
+export type Dispatched<T> = Deno.KvEntryMaybe<T> | Deno.KvCommitResult | void;
+export type KvCommand<C extends KvMethods = KvMethods, A = unknown[]> = {
+  cmd: C;
+  args: A;
+};
 
 const isKvCommand = (o: unknown): o is KvCommand =>
   typeof o === "object" &&
@@ -9,14 +13,23 @@ const isKvCommand = (o: unknown): o is KvCommand =>
   typeof o.cmd === "string" &&
   Array.isArray(o.args);
 
-type KvGetCommand = KvCommand<"get", [Deno.KvKey, { consistency?: Deno.KvConsistencyLevel }?]>;
-const isKvGetCommand = (o: unknown): o is KvGetCommand => isKvCommand(o) && o.cmd === "get";
+type KvGetCommand = KvCommand<
+  "get",
+  [Deno.KvKey, { consistency?: Deno.KvConsistencyLevel }?]
+>;
+const isKvGetCommand = (o: unknown): o is KvGetCommand =>
+  isKvCommand(o) && o.cmd === "get";
 
-export type KvSetCommand = KvCommand<"set", [Deno.KvKey, unknown, { expireIn?: number }?]>;
-const isKvSetCommand = (o: unknown): o is KvSetCommand => isKvCommand(o) && o.cmd === "set";
+export type KvSetCommand = KvCommand<
+  "set",
+  [Deno.KvKey, unknown, { expireIn?: number }?]
+>;
+const isKvSetCommand = (o: unknown): o is KvSetCommand =>
+  isKvCommand(o) && o.cmd === "set";
 
 export type KvDeleteCommand = KvCommand<"delete", [Deno.KvKey]>;
-const isKvDeleteCommand = (o: unknown): o is KvDeleteCommand => isKvCommand(o) && o.cmd === "delete";
+const isKvDeleteCommand = (o: unknown): o is KvDeleteCommand =>
+  isKvCommand(o) && o.cmd === "delete";
 
 async function single<T>(f: (db: Deno.Kv) => Promise<T>) {
   const db = await Deno.openKv();
@@ -25,7 +38,9 @@ async function single<T>(f: (db: Deno.Kv) => Promise<T>) {
   return ret as T;
 }
 
-export default function dispatcher(command: KvCommand) {
+export default function dispatcher<T>(
+  command: KvCommand,
+): Promise<Dispatched<T>> {
   if (isKvGetCommand(command)) {
     return single((db) => db.get(...command.args));
   }
