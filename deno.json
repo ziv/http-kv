@@ -1,12 +1,19 @@
 {
-  "id": "xpr-rpc-kv",
-  "tasks": {
-    "dev": "deno run --watch main.ts"
+  "id": "@xpr/http-kv",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "RPC server & client for Deno.Kv",
+  "exports": {
+    ".": "./mod.ts",
+    "./dispatcher": "./dispatcher.ts",
+    "./client": "./client.ts"
   },
-  "imports": {
-    "jose": "npm:jose@^5.9.6"
-  },
-  "fmt": {
-    "lineWidth": 120
+  "publish": {
+    "exclude": [
+      ".github",
+      "tmp",
+      "node_modules",
+      "package*.json"
+    ]
   }
 }

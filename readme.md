@@ -1,3 +1,3 @@
 # http-kv
 
-RPC server & client for Deno.Kv
+RPC server and client for Deno.Kv

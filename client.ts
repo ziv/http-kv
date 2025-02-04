@@ -1,15 +1,15 @@
-import { KvCommand } from "./kv.ts";
+import { KvCommand } from "./dispatcher.ts";
 
 export default class HttpKv implements Pick<Deno.Kv, "get" | "set" | "delete"> {
-  private readonly request: <T>(command: KvCommand) => Promise<T>;
+  private readonly request: <T>(rpc: KvCommand) => Promise<T>;
 
-  constructor(private readonly url: string, token: string) {
-    this.request = <T>(command: KvCommand): Promise<T> =>
+  constructor(url: string, token: string, tokenHeader = "RPC_KV_AUTHORIZATION") {
+    this.request = <T>(rpc: KvCommand): Promise<T> =>
       fetch(url, {
         method: "POST",
-        body: JSON.stringify(command),
+        body: JSON.stringify(rpc),
         headers: {
-          Authorization: `Bearer ${token}`,
+          [tokenHeader]: token,
           "Content-Type": "application/json",
         },
       }).then((res) => res.json() as Promise<T>);

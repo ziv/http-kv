@@ -1,22 +1,60 @@
 /**
- * HTTP-KV server
+ * Example for simple minimal http-kv RPC server
+ *
  * run with `deno run --allow-net --allow-env --unstable-kv server/main.ts`
  * required env vars:
  * - KV_SECRET
  */
-import authenticate from "../utils/auth.ts";
-import { errorCode, json } from "../utils/http.ts";
-import { debuglog, errorlog } from "../utils/log.ts";
-import kv from "../kv/server-kv.ts";
-import { errorString } from "../utils/error.ts";
+import { type JWTPayload, jwtVerify } from "npm:jose";
+import dispatcher from "../dispatcher.ts";
+
+async function authenticate(req: Request): Promise<JWTPayload> {
+  const secret = Deno.env.get("KV_SECRET");
+  if (!secret) {
+    throw new Error("KV_SECRET is required");
+  }
+  if (secret.length < 32) {
+    throw new Error("KV_SECRET must be at least 32 characters");
+  }
+  const token = req.headers.get("RPC_KV_AUTHORIZATION");
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+  try {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(secret),
+    );
+    return payload;
+  } catch (_) {
+    throw new Error("Unauthorized");
+  }
+}
+
+const debuglog = (msg: string, ...args: unknown[]) =>
+  console.log(JSON.stringify({ msg, args }));
 
 Deno.serve(async (req) => {
   try {
-    const p = await authenticate(req);
-    debuglog("authenticated request", p);
-    return json(kv(await req.json()));
+    const id = await authenticate(req);
+    debuglog("authenticated", id);
   } catch (e) {
-    errorlog("kv error", errorString(e));
-    return json({ ok: false }, errorCode(e));
+    debuglog("unauthorized request", e);
+    return new Response(null, { status: 401 });
+  }
+  try {
+    return new Response(JSON.stringify(await dispatcher(await req.json())), {
+      status: 200,
+      headers: {
+        "content-type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Max-Age": "86400",
+      },
+    });
+  } catch (e) {
+    debuglog(String(e), (e as Error)?.stack);
+    return new Response(null, { status: 500 });
   }
 });
