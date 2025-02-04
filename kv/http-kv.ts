@@ -1,6 +1,6 @@
 import { KvCommand } from "./kv.ts";
 
-export default class HttpKv implements Pick<Deno.Kv, "get" | "set"> {
+export default class HttpKv implements Pick<Deno.Kv, "get" | "set" | "delete"> {
   private readonly request: <T>(command: KvCommand) => Promise<T>;
 
   constructor(private readonly url: string, token: string) {
@@ -28,5 +28,9 @@ export default class HttpKv implements Pick<Deno.Kv, "get" | "set"> {
     options?: { expireIn?: number },
   ): Promise<Deno.KvCommitResult> {
     return this.request({ cmd: "set", args: [key, value, options] });
+  }
+
+  delete(key: Deno.KvKey): Promise<void> {
+    return this.request({ cmd: "delete", args: [key] });
   }
 }

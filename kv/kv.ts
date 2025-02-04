@@ -5,7 +5,7 @@ export type KvCommand<CMD extends KvPublicApi = KvPublicApi, ARGS = unknown[]> =
 
 export type KvGetCommand = KvCommand<"get", [Deno.KvKey, { consistency?: Deno.KvConsistencyLevel }?]>;
 export type KvSetCommand = KvCommand<"set", [Deno.KvKey, unknown, { expireIn?: number }?]>;
-
+export type KvDeleteCommand = KvCommand<"delete", [Deno.KvKey]>;
 
 function isObject(o: unknown): o is Record<string, unknown> {
   return typeof o === "object" && o !== null;
@@ -17,8 +17,8 @@ function isString(o: unknown): o is string {
 
 export function isKvCommand(o: unknown): o is KvCommand {
   return isObject(o) &&
-      isString(o.cmd) &&
-      ["get", "set"].includes(o.cmd);
+    isString(o.cmd) &&
+    ["get", "set"].includes(o.cmd);
 }
 
 export function isKvGetCommand(o: unknown): o is KvGetCommand {
@@ -27,6 +27,10 @@ export function isKvGetCommand(o: unknown): o is KvGetCommand {
 
 export function isKvSetCommand(o: unknown): o is KvSetCommand {
   return isKvCommand(o) && o.cmd === "set";
+}
+
+export function isKvDeleteCommand(o: unknown): o is KvDeleteCommand {
+  return isKvCommand(o) && o.cmd === "delete";
 }
 
 //
