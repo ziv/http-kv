@@ -1,9 +1,17 @@
-import { KvCommand } from "./dispatcher.ts";
+export type KvMethods = keyof Deno.Kv;
+export type KvCommand<C extends KvMethods = KvMethods, A = unknown[]> = {
+  cmd: C;
+  args: A;
+};
 
 export default class HttpKv implements Pick<Deno.Kv, "get" | "set" | "delete"> {
   private readonly request: <T>(rpc: KvCommand) => Promise<T>;
 
-  constructor(url: string, token: string, tokenHeader = "RPC_KV_AUTHORIZATION") {
+  constructor(
+    url: string,
+    token: string,
+    tokenHeader = "RPC_KV_AUTHORIZATION",
+  ) {
     this.request = <T>(rpc: KvCommand): Promise<T> =>
       fetch(url, {
         method: "POST",

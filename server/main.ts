@@ -18,17 +18,13 @@ async function authenticate(req: Request): Promise<JWTPayload> {
   }
   const token = req.headers.get("RPC_KV_AUTHORIZATION");
   if (!token) {
-    throw new Error("Unauthorized");
+    throw new Error("Missing token");
   }
-  try {
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(secret),
-    );
-    return payload;
-  } catch (_) {
-    throw new Error("Unauthorized");
-  }
+  const { payload } = await jwtVerify(
+    token,
+    new TextEncoder().encode(secret),
+  );
+  return payload;
 }
 
 const debuglog = (msg: string, ...args: unknown[]) =>
@@ -39,7 +35,7 @@ Deno.serve(async (req) => {
     const id = await authenticate(req);
     debuglog("authenticated", id);
   } catch (e) {
-    debuglog("unauthorized request", e);
+    debuglog(`unauthorized request ${String(e)}`, (e as Error)?.stack);
     return new Response(null, { status: 401 });
   }
   try {

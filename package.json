@@ -1,0 +1,24 @@
+{
+  "name": "@xpr/http-kv",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "RPC server & client for Deno.Kv",
+  "exports": "./client.js",
+  "types": "./client.d.ts",
+  "author": "xpr",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/deno": "^2.0.0"
+  },
+  "files": [
+    "LICENSE",
+    "client.js",
+    "client.d.ts",
+    "package.json",
+    "package-lock.json",
+    "readme.md"
+  ]
+}
