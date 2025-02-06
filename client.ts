@@ -1,23 +1,16 @@
 export type KvMethods = keyof Deno.Kv;
-export type KvCommand<C extends KvMethods = KvMethods, A = unknown[]> = {
-  cmd: C;
-  args: A;
-};
+export type KvCommand<C extends KvMethods = KvMethods, A = unknown[]> = { cmd: C; args: A };
 
 export default class HttpKv implements Pick<Deno.Kv, "get" | "set" | "delete"> {
   private readonly request: <T>(rpc: KvCommand) => Promise<T>;
 
-  constructor(
-    url: string,
-    token: string,
-    tokenHeader = "RPC_KV_AUTHORIZATION",
-  ) {
+  constructor(url: string, token: string) {
     this.request = <T>(rpc: KvCommand): Promise<T> =>
       fetch(url, {
         method: "POST",
         body: JSON.stringify(rpc),
         headers: {
-          [tokenHeader]: token,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       }).then((res) => res.json() as Promise<T>);
